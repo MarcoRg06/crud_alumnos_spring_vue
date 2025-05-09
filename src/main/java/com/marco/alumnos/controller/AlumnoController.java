@@ -1,5 +1,6 @@
 package com.marco.alumnos.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class AlumnoController {
         return alumnoRepository.findAll();
         
     }
+
     //metodo get para insertar un alumno en la base de datos
     @PostMapping("/insertar-alumnos")
     public Alumno InsertarAlumno(@RequestBody Alumno alumno) {
@@ -47,4 +49,10 @@ public class AlumnoController {
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());
     }
+    //Metodo para eliminar un alumno de la base de datos
+    @DeleteMapping("/eliminar-alumnos/{id}")
+    public void eliminarAlumno(@PathVariable Long id) {
+        alumnoRepository.deleteById(id);
+    }
+
 }
