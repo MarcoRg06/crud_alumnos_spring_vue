@@ -10,13 +10,21 @@ const nuevoAlumno = ref({
     telefono: '',
     imagenURL: ''
 });
+const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
     const response = await axios.get('http://localhost:8081/alumnos/traer-lumnos');//traer todos los alumnos
     alumnos.value = response.data;
     console.log(alumnos.value); 
 }
 const agregarAlumno = async () => {
-    await axios.post('http://localhost:8081/alumnos/insertar-alumnos', nuevoAlumno.value);
+    if (editado.value) {
+        // Si se está editando un alumno, actualizamos el alumno
+        await axios.put(`http://localhost:8081/alumnos/editar-alumnos/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+        editado.value = false; // Reiniciamos la variable de edición
+    } else {
+        // Si no se está editando, agregamos un nuevo alumno
+        await axios.post('http://localhost:8081/alumnos/insertar-alumnos', nuevoAlumno.value);
+    }
     await cargarAlumnos(); // Recargamos la lista de alumnos después de agregar uno nuevo
     nuevoAlumno.value = { // Limpiamos el formulario
         nombre: '',
@@ -25,6 +33,10 @@ const agregarAlumno = async () => {
         telefono: '',
         imagenURL: ''
     };
+}
+const editarAlumnos = (alumno) => {
+    Object.assign(nuevoAlumno.value, alumno); // Asignamos los valores del alumno seleccionado al formulario
+    editado.value = true; // Activamos el modo de edición
 }
 const eliminarAlumno = async (id) => {
     await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos/${id}`);
@@ -64,7 +76,9 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
             <input type="text" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
           </div>
           </div>
-          <button type="submit" class="btn btn-primary">Agregar Alumno</button>
+          <button type="submit" class="btn btn-primary">
+            {{ editado ? 'Actualizar Alumno' : 'Agregar Alumno' }}
+          </button>
         </form>
       </div>
     </div>
@@ -95,7 +109,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
       <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>
       <td>
         <button @click=eliminarAlumno(alumno.id) class="btn btn-danger mx-2"><i class="bi bi-trash2"></i></button>
-        <button class="btn btn-warning"><i class="bi bi-pencil-fill"></i></button>
+        <button @click=editarAlumnos(alumno) class="btn btn-warning"><i class="bi bi-pencil-fill"></i></button>
       </td>
     </tr>    
   </tbody>
