@@ -15,6 +15,17 @@ const cargarAlumnos = async () => {
     alumnos.value = response.data;
     console.log(alumnos.value); 
 }
+const agregarAlumno = async () => {
+    await axios.post('http://localhost:8081/alumnos/insertar-alumnos', nuevoAlumno.value);
+    await cargarAlumnos(); // Recargamos la lista de alumnos después de agregar uno nuevo
+    nuevoAlumno.value = { // Limpiamos el formulario
+        nombre: '',
+        apellidos: '',
+        carrera: '',
+        telefono: '',
+        imagenURL: ''
+    };
+}
 onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el componente se monta
 </script>
 
@@ -40,7 +51,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
           </div>
           <div class="col-md-6 mb-3">
             <label for="telefono" class="form-label">Telefono</label>
-            <input type="text" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
+            <input type="number" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
           </div>
           <div class="col-md-6 mb-3">
             <label for="imagenURL" class="form-label">Imagen URL</label>
@@ -53,10 +64,11 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
     </div>
 
     <div class="col-md-12">
-      <h2>Tabla de Alumnos</h2>
-  
-          <table class="table">
-  <thead>
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Tabla de Alumnos</h5>
+          <table class="table table-hover allign-middle">
+  <thead class="table-light">
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Nombre</th>
@@ -76,11 +88,14 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
       <td>{{ alumno.telefono }}</td>
       <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>
       <td>
-        <button class="btn btn-danger">Eliminar</button>
+        <button class="btn btn-danger mx-2"><i class="bi bi-trash2"></i></button>
+        <button class="btn btn-warning"><i class="bi bi-pencil-fill"></i></button>
       </td>
     </tr>    
   </tbody>
 </table>
+        </div>
+      </div>        
     </div>
   </div>
   
