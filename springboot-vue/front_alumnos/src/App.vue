@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted} from 'vue';
 import axios from 'axios';
-
+import swal from 'sweetalert2';
 const alumnos = ref([]); // Definimos una variable reactiva para almacenar los alumnos
 const nuevoAlumno = ref({
     nombre: '',
@@ -24,6 +24,12 @@ const agregarAlumno = async () => {
     } else {
         // Si no se está editando, agregamos un nuevo alumno
         await axios.post('http://localhost:8081/alumnos/insertar-alumnos', nuevoAlumno.value);
+        swal.fire({
+            icon: 'success',
+            title: 'Alumno Agregado Correctamente',
+            showConfirmButton: false,
+            timer: 1500
+        });
     }
     await cargarAlumnos(); // Recargamos la lista de alumnos después de agregar uno nuevo
     nuevoAlumno.value = { // Limpiamos el formulario
@@ -39,9 +45,45 @@ const editarAlumnos = (alumno) => {
     editado.value = true; // Activamos el modo de edición
 }
 const eliminarAlumno = async (id) => {
-    await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos/${id}`);
-    console.log(`Alumno con ID ${id} eliminado`);
-    await cargarAlumnos(); // Recargamos la lista de alumnos después de eliminar uno
+    swal.fire({
+        title: '¿Estás seguro de eliminar el alumno?',
+        text: "¡No podrás revertir esto!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminarlo'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await eliminarAlumnoPorId(id);
+            swal.fire(
+                'Eliminado!',
+                'El alumno ha sido eliminado.',
+                'success'
+        )
+        } 
+    })
+
+}
+const eliminarAlumnoPorId = async (id) => {
+  try {
+        await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos/${id}`);
+        /*swal.fire({
+            icon: 'success',
+            title: 'Alumno Eliminado Correctamente',
+            showConfirmButton: false,
+            timer: 1500
+        });*/
+        console.log(`Alumno con ID ${id} eliminado`);
+        await cargarAlumnos(); // Recargamos la lista de alumnos después de eliminar uno
+      } catch (error) {
+        console.error('Error al eliminar el alumno:', error);
+        swal.fire({
+            icon: 'error',
+            title: 'Error al eliminar el alumno',
+            text: 'No se pudo eliminar el alumno.',
+        });
+      }
 }
 
 onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el componente se monta
