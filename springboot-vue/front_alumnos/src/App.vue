@@ -165,4 +165,119 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
 </template>
 
 <style scoped>
+/* Fondo general */
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px 15px;
+  background-color: #f3f4f6;
+  border-radius: 15px;
+}
+
+/* Estilo de las tarjetas */
+.card {
+  border-radius: 16px;
+  border: none;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+}
+
+/* Títulos */
+h2, h5 {
+  font-weight: bold;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Etiquetas */
+label {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Inputs */
+input.form-control {
+  border-radius: 10px;
+  border: 2px solid #a78bfa;
+  transition: 0.3s ease-in-out;
+}
+
+input.form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px #a78bfa;
+}
+
+/* Botones */
+button.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 10px 18px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1e3a8a;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+.btn-warning {
+  background-color: #facc15;
+  border-color: #facc15;
+  color: #1e3a8a;
+}
+
+.btn-warning:hover {
+  background-color: #eab308;
+  color: white;
+}
+
+/* Tabla */
+.table {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #a78bfa;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+}
+
+.table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Imagen en tabla */
+table img {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #3b82f6;
+}
+
+/* Hover en tabla */
+.table-hover tbody tr:hover {
+  background-color: #f0f0ff;
+}
 </style>
+
