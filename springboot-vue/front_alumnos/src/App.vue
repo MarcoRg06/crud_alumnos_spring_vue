@@ -26,6 +26,12 @@ const agregarAlumno = async () => {
         imagenURL: ''
     };
 }
+const eliminarAlumno = async (id) => {
+    await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos/${id}`);
+    console.log(`Alumno con ID ${id} eliminado`);
+    await cargarAlumnos(); // Recargamos la lista de alumnos después de eliminar uno
+}
+
 onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el componente se monta
 </script>
 
@@ -88,7 +94,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
       <td>{{ alumno.telefono }}</td>
       <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>
       <td>
-        <button class="btn btn-danger mx-2"><i class="bi bi-trash2"></i></button>
+        <button @click=eliminarAlumno(alumno.id) class="btn btn-danger mx-2"><i class="bi bi-trash2"></i></button>
         <button class="btn btn-warning"><i class="bi bi-pencil-fill"></i></button>
       </td>
     </tr>    
