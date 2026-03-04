@@ -4,5 +4,5 @@ VOLUME /tmp
 
 EXPOSE 8080
 
-ADD ./target/alumnos-0.0.1-SNAPSHOT.jar app.jar
+ADD springboot-vue/alumnos/target/alumnos-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
