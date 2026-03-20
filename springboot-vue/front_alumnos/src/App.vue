@@ -20,7 +20,7 @@ const errores = ref({
 });
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
-  const response = await axios.get('http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/traer-alumnos');//traer todos los alumnos
+  const response = await axios.get('https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/traer-alumnos');//traer todos los alumnos
   alumnos.value = response.data;
   console.log(alumnos.value);
 }
@@ -79,7 +79,7 @@ const agregarAlumno = async () => {
   }
   if (editado.value) {
     // Si se está editando un alumno, actualizamos el alumno
-    await axios.put(`http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+    await axios.put(`https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
     editado.value = false; // Reiniciamos la variable de edición
     swal.fire({
       icon: 'success',
@@ -89,7 +89,7 @@ const agregarAlumno = async () => {
     });
   } else {
     // Si no se está editando, agregamos un nuevo alumno
-    await axios.post('http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/insertar-alumno', nuevoAlumno.value);
+    await axios.post('https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/insertar-alumno', nuevoAlumno.value);
     swal.fire({
       icon: 'success',
       title: 'Alumno Agregado Correctamente',
@@ -136,7 +136,7 @@ const eliminarAlumno = async (id) => {
 }
 const eliminarAlumnoPorId = async (id) => {
   try {
-    await axios.delete(`http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/eliminar-alumnos/${id}`);
+    await axios.delete(`https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/eliminar-alumnos/${id}`);
     swal.fire({
         icon: 'success',
         title: 'Alumno Eliminado Correctamente',
