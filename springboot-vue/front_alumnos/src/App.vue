@@ -21,7 +21,7 @@ const errores = ref({
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
   const response = await axios.get(
-    "https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/traer-alumnos",
+    `https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/traer-alumnos`,
     {
       headers: {
         "ngrok-skip-browser-warning": "69420",
@@ -82,7 +82,7 @@ const validarCampos = () =>{
 const agregarAlumno = async () => {
   if (editado.value) {
     await axios.put(
-     "https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/editar-alumnos/${nuevoAlumno.value.id}",
+     `https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/editar-alumnos/${nuevoAlumno.value.id}`,
       nuevoAlumno.value,
       {
         headers: {
@@ -90,7 +90,7 @@ const agregarAlumno = async () => {
         },
       },
     );
-    Swal.fire({
+    swal.fire({
       icon: "success",
       title: "Alumno Actualizado Correctamente",
       showConfirmButton: false,
@@ -99,7 +99,7 @@ const agregarAlumno = async () => {
     editado.value = false;
   } else {
     await axios.post(
-      "https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/insertar-alumno",
+      `https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/insertar-alumno`,
       nuevoAlumno.value,
       {
         headers: {
@@ -107,7 +107,7 @@ const agregarAlumno = async () => {
         },
       },
     );
-    Swal.fire({
+    swal.fire({
       icon: "success",
       title: "Alumno Agregado Correctamente",
       showConfirmButton: false,
