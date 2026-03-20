@@ -7,7 +7,7 @@ import swal from 'sweetalert2';
 const alumnos = ref([]); // Definimos una variable reactiva para almacenar los alumnos
 const nuevoAlumno = ref({
   nombre: '',
-  apellidos: '',
+  apellido: '',
   carrera: '',
   telefono: '',
   imagenURL: '',
@@ -15,12 +15,12 @@ const nuevoAlumno = ref({
 
 const errores = ref({
   nombre: '',
-  apellidos: '',
+  apellido: '',
   telefono: ''
 });
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
-  const response = await axios.get('http://localhost:8081/alumnos/traer-alumnos');//traer todos los alumnos
+  const response = await axios.get('http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/traer-alumnos');//traer todos los alumnos
   alumnos.value = response.data;
   console.log(alumnos.value);
 }
@@ -29,14 +29,14 @@ const validarCampos = () =>{
   let valido = true;
   errores.value = {
     nombre: '',
-    apellidos: '',
+    apellido: '',
     telefono: ''
   };
 
   const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
   const soloNumeros = /^[0-9]{10}$/;
 
-  if(!soloLetras.test(nuevoAlumno.value.nombre.trim())){
+  if(!soloLetras.test((nuevoAlumno.value.nombre || "").trim())){
     swal.fire({
       icon: 'warning',
       text: 'Datos invalidos en Nombre',
@@ -46,25 +46,25 @@ const validarCampos = () =>{
     nuevoAlumno.value.nombre = '';
     valido = false;
   }
-  if(!soloLetras.test(nuevoAlumno.value.apellidos.trim())){
+  if(!soloLetras.test((nuevoAlumno.value.apellido || "").trim())){
      swal.fire({
       icon: 'warning',
       text: 'Datos invalidos en Apellidos',
       showConfirmButton: false,
       timer: 2000
     });
-    nuevoAlumno.value.apellidos = '';
+    nuevoAlumno.value.apellido = '';
     valido = false;
 
   }
-  if(!soloNumeros.test(nuevoAlumno.value.telefono.trim())){
+ if(!soloNumeros.test((nuevoAlumno.value.telefono || "").trim())){
      swal.fire({
       icon: 'warning',
       text: 'Datos invalidos en Telefono',
       showConfirmButton: false,
       timer: 2000
     });
-    errores.value.telefono = '';
+    nuevoAlumno.value.telefono = '';
     valido = false;
   }
   
@@ -79,7 +79,7 @@ const agregarAlumno = async () => {
   }
   if (editado.value) {
     // Si se está editando un alumno, actualizamos el alumno
-    await axios.put(`http://localhost:8081/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+    await axios.put(`http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
     editado.value = false; // Reiniciamos la variable de edición
     swal.fire({
       icon: 'success',
@@ -89,7 +89,7 @@ const agregarAlumno = async () => {
     });
   } else {
     // Si no se está editando, agregamos un nuevo alumno
-    await axios.post('http://localhost:8081/alumnos/insertar-alumnos', nuevoAlumno.value);
+    await axios.post('http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/insertar-alumno', nuevoAlumno.value);
     swal.fire({
       icon: 'success',
       title: 'Alumno Agregado Correctamente',
@@ -100,7 +100,7 @@ const agregarAlumno = async () => {
   await cargarAlumnos(); // Recargamos la lista de alumnos después de agregar uno nuevo
   nuevoAlumno.value = { // Limpiamos el formulario
     nombre: '',
-    apellidos: '',
+    apellido: '',
     carrera: '',
     telefono: '',
     imagenURL: ''
@@ -136,7 +136,7 @@ const eliminarAlumno = async (id) => {
 }
 const eliminarAlumnoPorId = async (id) => {
   try {
-    await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos/${id}`);
+    await axios.delete(`http://13.220.238.68:8080/alumnos/traer-alumnos/alumnos/eliminar-alumnos/${id}`);
     swal.fire({
         icon: 'success',
         title: 'Alumno Eliminado Correctamente',
@@ -176,7 +176,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
               </div>
               <div class="col-md-6 mb-3">
                 <label for="apellidos" class="form-label">Apellidos</label>
-                <input type="text" class="form-control" maxlength="30" id="apellidos" v-model="nuevoAlumno.apellidos"
+                <input type="text" class="form-control" maxlength="30" id="apellidos" v-model="nuevoAlumno.apellido"
                   required>
               </div>
               <div class="col-md-6 mb-3">
@@ -230,7 +230,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
                 <tr v-for="alumno in alumnos" :key="alumno.id">
                   <td>{{ alumno.id }}</td>
                   <td>{{ alumno.nombre }}</td>
-                  <td>{{ alumno.apellidos }}</td>
+                  <td>{{ alumno.apellido }}</td>
                   <td>{{ alumno.carrera }}</td>
                   <td>{{ alumno.telefono }}</td>
                   <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>

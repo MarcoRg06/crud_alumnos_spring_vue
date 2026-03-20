@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import com.marco.alumnos.repository.AlumnoRepository;
 @RestController
 @RequestMapping("/alumnos")
 @CrossOrigin(origins = "*")
+
 public class AlumnoController {
     @Autowired
     private AlumnoService alumnoService;
@@ -36,7 +38,7 @@ public class AlumnoController {
         return alumno.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    @PostMapping("/insertar-alumnos")
+    @PostMapping("/insertar-alumno")
     public Alumno insertarAlumno(@RequestBody Alumno alumno){
         return alumnoService.guardarAlumno(alumno);
     }

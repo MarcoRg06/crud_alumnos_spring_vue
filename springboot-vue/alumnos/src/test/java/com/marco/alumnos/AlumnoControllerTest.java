@@ -70,7 +70,7 @@ public class AlumnoControllerTest {
 
         when(alumnoService.guardarAlumno(org.mockito.ArgumentMatchers.any(Alumno.class))).thenReturn(alumnoNuevo);
 
-        mockMvc.perform(post("/alumnos/insertar-alumnos")
+        mockMvc.perform(post("/alumnos/insertar-alumno")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(alumnoNuevo)))
 
