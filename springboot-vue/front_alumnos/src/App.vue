@@ -20,10 +20,17 @@ const errores = ref({
 });
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
-  const response = await axios.get('https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/traer-alumnos');//traer todos los alumnos
+  const response = await axios.get(
+    "https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/traer-alumnos",
+    {
+      headers: {
+        "ngrok-skip-browser-warning": "69420",
+      },
+    },
+  );
   alumnos.value = response.data;
   console.log(alumnos.value);
-}
+};
 const validarCampos = () =>{
 
   let valido = true;
@@ -73,41 +80,45 @@ const validarCampos = () =>{
 }
 
 const agregarAlumno = async () => {
-
-  if(!validarCampos()){
-    return;
-  }
   if (editado.value) {
-    // Si se está editando un alumno, actualizamos el alumno
-    await axios.put(`https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
-    editado.value = false; // Reiniciamos la variable de edición
-    swal.fire({
-      icon: 'success',
-      title: 'Alumno Actualizado Correctamente',
+    await axios.put(
+     "https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/editar-alumnos/${nuevoAlumno.value.id}",
+      nuevoAlumno.value,
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "69420",
+        },
+      },
+    );
+    Swal.fire({
+      icon: "success",
+      title: "Alumno Actualizado Correctamente",
       showConfirmButton: false,
-      timer: 1500
+      timer: 1500,
     });
+    editado.value = false;
   } else {
-    // Si no se está editando, agregamos un nuevo alumno
-    await axios.post('https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/insertar-alumno', nuevoAlumno.value);
-    swal.fire({
-      icon: 'success',
-      title: 'Alumno Agregado Correctamente',
+    await axios.post(
+      "https://nicolette-tissual-lashunda.ngrok-free.dev/alumnos/insertar-alumno",
+      nuevoAlumno.value,
+      {
+        headers: {
+          "ngrok-skip-browser-warning": "69420",
+        },
+      },
+    );
+    Swal.fire({
+      icon: "success",
+      title: "Alumno Agregado Correctamente",
       showConfirmButton: false,
-      timer: 1500
+      timer: 1500,
     });
   }
-  await cargarAlumnos(); // Recargamos la lista de alumnos después de agregar uno nuevo
-  nuevoAlumno.value = { // Limpiamos el formulario
-    nombre: '',
-    apellido: '',
-    carrera: '',
-    telefono: '',
-    imagenURL: ''
-  };
 
+  await cargarAlumnos();
+  limpiarFormulario();
+};
 
-}
 const editarAlumnos = (alumno) => {
   Object.assign(nuevoAlumno.value, alumno); // Asignamos los valores del alumno seleccionado al formulario
   editado.value = true; // Activamos el modo de edición
