@@ -11,12 +11,14 @@ const nuevoAlumno = ref({
   carrera: '',
   telefono: '',
   imagenURL: '',
+  email: ''
 });
 
 const errores = ref({
   nombre: '',
   apellido: '',
-  telefono: ''
+  telefono: '',
+  email: ''
 });
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
@@ -30,11 +32,13 @@ const validarCampos = () =>{
   errores.value = {
     nombre: '',
     apellido: '',
-    telefono: ''
+    telefono: '',
+    email: ''
   };
 
   const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
   const soloNumeros = /^[0-9]{10}$/;
+  const soloEmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com|tlaxiaco\.tecnm\.mx)$/;
 
   if(!soloLetras.test((nuevoAlumno.value.nombre || "").trim())){
     swal.fire({
@@ -65,6 +69,16 @@ const validarCampos = () =>{
       timer: 2000
     });
     nuevoAlumno.value.telefono = '';
+    valido = false;
+  }
+  if(!soloEmail.test((nuevoAlumno.value.email || "").trim())){
+     swal.fire({
+      icon: 'warning',
+      text: 'Datos invalidos en Correo electronico',
+      showConfirmButton: false,
+      timer: 2000
+    });
+    nuevoAlumno.value.email = '';
     valido = false;
   }
   
@@ -103,7 +117,8 @@ const agregarAlumno = async () => {
     apellido: '',
     carrera: '',
     telefono: '',
-    imagenURL: ''
+    imagenURL: '',
+    email: ''
   };
 
 
@@ -190,6 +205,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
                   <option value="Ingenieria en Sistemas Computacionales">Ingenieria en Sistemas Computacionales</option>
                   <option value="Licenciatura en Contador Público">Licenciatura en Contador Público</option>
                   <option value="Licenciatura en Arquitectura">Licenciatura en Arquitectura</option>
+                  <option value="Licenciatura en Arquitectura">Licenciatura en Administración</option>
                 </select>
 
               </div>
@@ -197,6 +213,10 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
                 <label for="telefono" class="form-label">Telefono</label>
                 <input type="text" name="telefono" maxlength="10" class="form-control" id="telefono"
                   v-model="nuevoAlumno.telefono" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <Label for="email" class="form-label"  >Correo electronico</Label>
+                <input type="text" name="email" maxlength="64" class="form-control" id="email" v-model="nuevoAlumno.email">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="imagenURL" class="form-label">Imagen URL</label>
@@ -221,6 +241,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
                   <th scope="col">Nombre</th>
                   <th scope="col">Apellidos</th>
                   <th scope="col">Carrera</th>
+                  <th scope="col">Email</th>
                   <th scope="col">Telefono</th>
                   <th scope="col">Imagen</th>
                   <th scope="col">Acciones</th>
@@ -232,6 +253,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
                   <td>{{ alumno.nombre }}</td>
                   <td>{{ alumno.apellido }}</td>
                   <td>{{ alumno.carrera }}</td>
+                  <td>{{ alumno.email }}</td>
                   <td>{{ alumno.telefono }}</td>
                   <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>
                   <td>
