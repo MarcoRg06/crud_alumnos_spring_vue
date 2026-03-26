@@ -2,8 +2,21 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import swal from 'sweetalert2';
+import TablaAlumnos from './components/TablaAlumnos.vue';
 
-
+const carreras = [
+  'Ingenieria en Mecatronica',
+  'Ingenieria en Gestion Empresarial',
+  'Ingenieria Industrial',
+  'Ingenieria Civil',
+  'Ingenieria en Sistemas Computacionales',
+  'Licenciatura en Administración',
+  'Licenciatura en Arquitectura',
+  'Licenciatura en Contador Público'
+]
+const filtrarPorCarrera = (carrera) => {
+  return alumnos.value.filter(alumno => alumno.carrera === carrera);
+}
 const alumnos = ref([]); // Definimos una variable reactiva para almacenar los alumnos
 const nuevoAlumno = ref({
   nombre: '',
@@ -91,16 +104,21 @@ const agregarAlumno = async () => {
   if(!validarCampos()){
     return;
   }
+
   if (editado.value) {
+  
     // Si se está editando un alumno, actualizamos el alumno
     await axios.put(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
     editado.value = false; // Reiniciamos la variable de edición
-    swal.fire({
+  
+   
+      swal.fire({
       icon: 'success',
       title: 'Alumno Actualizado Correctamente',
       showConfirmButton: false,
       timer: 1500
     });
+    
   } else {
     // Si no se está editando, agregamos un nuevo alumno
     await axios.post('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/insertar-alumno', nuevoAlumno.value);
@@ -124,9 +142,21 @@ const agregarAlumno = async () => {
 
 }
 const editarAlumnos = (alumno) => {
-  Object.assign(nuevoAlumno.value, alumno); // Asignamos los valores del alumno seleccionado al formulario
-  editado.value = true; // Activamos el modo de edición
-  
+ swal.fire({
+    title: '¿Deseas editar este alumno?',
+    text: `${alumno.nombre} ${alumno.apellido}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sí, editar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Object.assign(nuevoAlumno.value, alumno)
+      editado.value = true
+    }
+  })
 }
 const eliminarAlumno = async (id) => {
   swal.fire({
@@ -176,6 +206,8 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
 </script>
 
 <template>
+  
+
   <div class="container">
     <div class="row">
       <div class="col-md-12 mt-4">
@@ -185,13 +217,13 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
           @submit.prevent="agregarAlumno" >
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" maxlength="30" id="nombre" v-model="nuevoAlumno.nombre"
+                <label for="nombre" class="form-label" >Nombre</label>
+                <input type="text" placeholder="Inserte su Nombre" class="form-control" maxlength="30" id="nombre" v-model="nuevoAlumno.nombre"
                   required>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="apellidos" class="form-label">Apellidos</label>
-                <input type="text" class="form-control" maxlength="30" id="apellidos" v-model="nuevoAlumno.apellido"
+                <input type="text" placeholder="Apellido Paterno y Apellido Materno" class="form-control" maxlength="30" id="apellidos" v-model="nuevoAlumno.apellido"
                   required>
               </div>
               <div class="col-md-6 mb-3">
@@ -211,16 +243,16 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
               </div>
               <div class="col-md-6 mb-3">
                 <label for="telefono" class="form-label">Telefono</label>
-                <input type="text" name="telefono" maxlength="10" class="form-control" id="telefono"
+                <input type="text" placeholder="953*******" name="telefono" maxlength="10" class="form-control" id="telefono"
                   v-model="nuevoAlumno.telefono" required>
               </div>
               <div class="col-md-6 mb-3">
                 <Label for="email" class="form-label"  >Correo electronico</Label>
-                <input type="text" name="email" maxlength="64" class="form-control" id="email" v-model="nuevoAlumno.email">
+                <input type="text" placeholder="user@tlaxiaco.tecnm.mx" name="email" maxlength="64" class="form-control" id="email" v-model="nuevoAlumno.email">
               </div>
               <div class="col-md-6 mb-3">
                 <label for="imagenURL" class="form-label">Imagen URL</label>
-                <input type="text" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
+                <input type="text" placeholder="Enlace URL" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
               </div>
             </div>
             <button type="submit" class="btn btn-primary">
@@ -230,55 +262,29 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
         </div>
       </div>
 
-      <div class="col-md-12">
-        <div class="card shadow">
-          <div class="card-body">
-            <h5 class="card-title mb-3">Tabla de Alumnos</h5>
-            <table class="table table-hover allign-middle">
-              <thead class="table-light">
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Nombre</th>
-                  <th scope="col">Apellidos</th>
-                  <th scope="col">Carrera</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Telefono</th>
-                  <th scope="col">Imagen</th>
-                  <th scope="col">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="alumno in alumnos" :key="alumno.id">
-                  <td>{{ alumno.id }}</td>
-                  <td>{{ alumno.nombre }}</td>
-                  <td>{{ alumno.apellido }}</td>
-                  <td>{{ alumno.carrera }}</td>
-                  <td>{{ alumno.email }}</td>
-                  <td>{{ alumno.telefono }}</td>
-                  <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50" height="50"></td>
-                  <td>
-                    <button @click=eliminarAlumno(alumno.id) class="btn btn-danger mx-2"><i
-                        class="bi bi-trash2"></i></button>
-                    <button @click=editarAlumnos(alumno) class="btn btn-warning"><i
-                        class="bi bi-pencil-fill"></i></button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
 
   </div>
+<div class="container">
+
+    <TablaAlumnos
+      v-for="carrera in carreras"
+      :key="carrera"
+      :carrera="carrera"
+      :datos="filtrarPorCarrera(carrera)"
+      @editar="editarAlumnos"
+      @eliminar="eliminarAlumno"
+    />
+  </div>
+
 </template>
 
 <style scoped>
 /* Fondo general */
 .container {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: auto;
-  padding: 30px 15px;
+  padding: 30px 24px;
   background-color: #f3f4f6;
   border-radius: 15px;
 }
