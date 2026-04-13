@@ -1,57 +1,46 @@
 package com.marco.alumnos.controller;
+import com.marco.alumnos.model.Alumno;
 import com.marco.alumnos.model.Profesor;
 
 import com.marco.alumnos.repository.ProfesorRepository;
+import com.marco.alumnos.services.AlumnoService;
+import com.marco.alumnos.services.ProfesorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/profesores")
 @CrossOrigin(origins = "*")
 public class ProfesorController {
     @Autowired
-    private ProfesorRepository profesorRepository;
-    //metodo get para obtener todos los alumnos de la base de datos
-    @GetMapping("/traer-profesores")
-    public List<Profesor> TraerProfesores() {
-        return profesorRepository.findAll();
-
+    private ProfesorService profesorService;
+    @GetMapping("/traer-profesor")
+    public  List <Profesor> traerProfesor(){
+        return profesorService.obtenerTodos();
     }
-    //metodo get para obtener un profesor por su id
     @GetMapping("/traer-profesor/{id}")
-    public ResponseEntity<Profesor> TraerUnProfesor(@PathVariable Long id) {
-        return profesorRepository.findById(id)
-                .map(profesor -> ResponseEntity.ok(profesor))
+    public ResponseEntity<Profesor> traerUnDocente (@PathVariable Long id){
+        Optional<Profesor> profesor = profesorService.obtenerPorId(id);
+        return profesor.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    //metodo get para insertar un alumno en la base de datos
-    @PostMapping("/insertar-profesores")
-    public Profesor InsertarProfesor(@RequestBody Profesor profesor) {
-        return profesorRepository.save(profesor);
+    @PostMapping("/insertar-profesor")
+    public Profesor insertarDocente(@RequestBody Profesor profesor){
+        return profesorService.guardarProfesor(profesor);
     }
-    //Metodo para eidtar un alumno de la base de datos
-    @PutMapping("/editar-profesores/{id}")
-    public ResponseEntity<Profesor> EditarProfesor(@PathVariable Long id,@RequestBody Profesor profesor) {
-        return profesorRepository.findById(id).map(profesorExistente -> {
-            profesorExistente.setNombre(profesor.getNombre());
-            profesorExistente.setApellidos(profesor.getApellidos());
-            profesorExistente.setEmail(profesor.getEmail());
-            profesorExistente.setTelefono(profesor.getTelefono());
-            profesorExistente.setRfc(profesor.getRfc());
-            profesorExistente.setMateria(profesor.getMateria());
-            profesorExistente.setImagenURL(profesor.getImagenURL());
-            Profesor actualizado = profesorRepository.save(profesorExistente);
-            return ResponseEntity.ok(actualizado);
-        }).orElse(ResponseEntity.notFound().build());
+    @PutMapping("/editar-profesor/{id}")
+    public ResponseEntity<Profesor> actualizarProfesor(@PathVariable Long id, @RequestBody Profesor profesor){
+        Optional<Profesor> actualizado = profesorService.actualizarProfesor(id,profesor);
+        return actualizado.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    //Metodo para eliminar un alumno de la base de datos
-    @DeleteMapping("/eliminar-profesores/{id}")
-    public void eliminarProfesor(@PathVariable Long id) {
-        profesorRepository.deleteById(id);
+    @DeleteMapping ("/eliminar-profesor/{id}")
+    public ResponseEntity<Void> eliminarProfesor(@PathVariable Long id){
+        profesorService.eliminarProfesor(id);
+        return  ResponseEntity.ok().build();
     }
-
 }
