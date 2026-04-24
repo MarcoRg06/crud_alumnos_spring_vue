@@ -35,7 +35,8 @@ const errores = ref({
 });
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
-  const response = await axios.get('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/traer-alumnos');//traer todos los alumnos
+  const response = await axios.get('http://localhost:8081/alumnos/traer-alumnos');
+  //const response = await axios.get('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/traer-alumnos');//traer todos los alumnos
   alumnos.value = response.data;
   console.log(alumnos.value);
 }
@@ -108,7 +109,8 @@ const agregarAlumno = async () => {
   if (editado.value) {
   
     // Si se está editando un alumno, actualizamos el alumno
-    await axios.put(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+    await axios.put(`http://localhost:8081/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+    //await axios.put(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
     editado.value = false; // Reiniciamos la variable de edición
   
    
@@ -121,7 +123,8 @@ const agregarAlumno = async () => {
     
   } else {
     // Si no se está editando, agregamos un nuevo alumno
-    await axios.post('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/insertar-alumno', nuevoAlumno.value);
+    //await axios.post('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/insertar-alumno', nuevoAlumno.value);
+    await axios.post('http://localhost:8081/alumnos/insertar-alumno', nuevoAlumno.value);
     swal.fire({
       icon: 'success',
       title: 'Alumno Agregado Correctamente',
@@ -179,9 +182,160 @@ const eliminarAlumno = async (id) => {
   })
 
 }
+const imprimirAlumnos = async ({ carrera, datos }) => {
+  const printWindow = window.open('', '_blank');
+  
+  const logoArriba = new URL('./images/ArribaIEncabezado.png', import.meta.url).href;
+  const logoAbajo = new URL('./images/Abajo.png', import.meta.url).href;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @page {
+          size: letter;
+          margin: 15mm; 
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          color: #333;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        /* --- PIE DE PÁGINA FIJO AL FONDO DE LA HOJA --- */
+        .footer-fixed {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+        }
+        .footer-img { 
+          width: 100%;
+          height: 75px;
+          object-fit: contain;
+          display: block;
+        }
+
+        table { 
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        thead { display: table-header-group; }
+        tfoot { display: table-footer-group; }
+        tr { page-break-inside: avoid; }
+
+        /* --- ESTILOS DEL ENCABEZADO --- */
+        .header-cell {
+          border: none !important;
+          background-color: transparent !important;
+          padding-bottom: 20px; 
+        }
+        .header-img { 
+          width: 100%;
+          height: 110px;
+          object-fit: contain;
+          display: block;
+        }
+        h1 { 
+          color: #1e3a8a;
+          text-align: center;
+          margin-top: 15px;
+          margin-bottom: 5px;
+          font-size: 22px;
+          text-transform: uppercase;
+        }
+
+        /* --- ESTILOS DE LA TABLA DE DATOS --- */
+        .col-headers th { 
+          background-color: #6366f1 !important;
+          color: white !important;
+          padding: 12px 8px;
+          font-size: 13px;
+          border: 1px solid #4f46e5;
+        }
+
+        tbody td { 
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+          font-size: 12px;
+        }
+
+        tbody tr:nth-child(even) { 
+          background-color: #f9fafb !important; 
+        }
+
+        /* --- ESPACIADOR FANTASMA --- */
+        /* Esta celda invisible evita que las filas se impriman sobre la imagen del footer fijo */
+        .footer-space {
+          height: 85px; /* Un poco más alto que el .footer-img para dejar margen */
+          border: none !important;
+          background-color: transparent !important;
+        }
+      </style>
+    </head>
+    <body>
+
+      <div class="footer-fixed">
+        <img src="${logoAbajo}" class="footer-img">
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th colspan="4" class="header-cell">
+              <img src="${logoArriba}" class="header-img">
+              <h1>${carrera}</h1>
+            </th>
+          </tr>
+          <tr class="col-headers">
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${datos.map(alumno => `
+            <tr>
+              <td>${alumno.nombre || ''}</td>
+              <td>${alumno.apellido || ''}</td>
+              <td>${alumno.email || 'N/A'}</td>
+              <td>${alumno.telefono || ''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="4" class="footer-space">&nbsp;</td>
+          </tr>
+        </tfoot>
+      </table>
+
+    </body>
+    </html>
+  `;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+  }, 800);
+};
 const eliminarAlumnoPorId = async (id) => {
   try {
-    await axios.delete(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/eliminar-alumnos/${id}`);
+    //await axios.delete(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/eliminar-alumnos/${id}`);
+    await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos${id}`);
     swal.fire({
         icon: 'success',
         title: 'Alumno Eliminado Correctamente',
@@ -274,6 +428,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
       :datos="filtrarPorCarrera(carrera)"
       @editar="editarAlumnos"
       @eliminar="eliminarAlumno"
+      @imprimir="imprimirAlumnos"
     />
   </div>
 

@@ -11,7 +11,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['editar', 'eliminar'])
+const emit = defineEmits(['editar', 'eliminar', 'imprimir'])
+
+const imprimirTabla = () => {
+  emit('imprimir', { carrera: props.carrera, datos: props.datos })
+}
 
 const mostrarTodos = ref(false)
 const LIMITE = 5
@@ -37,14 +41,20 @@ const datosMostrados = computed(() =>
     <div class="carrera-header">
       <span class="carrera-badge">{{ datosFiltrados.length }} alumno{{ datosFiltrados.length !== 1 ? 's' : '' }}</span>
       <h2>{{ carrera }}</h2>
+
       <div class="header-line"></div>
     </div>
     <!-- Buscador -->
+
+
     <div class="buscador-wrapper">
       <span class="buscador-icon"></span>
       <input v-model="busqueda" type="text" class="buscador-input" placeholder="Buscar por nombre o apellido..." />
       <button v-if="busqueda" class="buscador-limpiar" @click="busqueda = ''">✕</button>
+
+
     </div>
+
     <p v-if="datosFiltrados.length === 0" class="sin-resultados">
       No se encontró ningún alumno con "{{ busqueda }}"
     </p>
@@ -76,9 +86,11 @@ const datosMostrados = computed(() =>
             <td>{{ item.telefono }}</td>
 
             <td>
-              <button @click="emit('eliminar', item.id)" class="btn btn-danger mx-2"><i
+              <button @click="emit('eliminar', item.id)" class="btn btn-danger mx-1" title="Eliminar"><i
                   class="bi bi-trash2"></i></button>
-              <button @click="emit('editar', item)" class="btn btn-warning"><i class="bi bi-pencil-fill"></i></button>
+              <button @click="emit('editar', item)" class="btn btn-warning mx-1" title="Editar"><i
+                  class="bi bi-pencil-fill"></i></button>
+
             </td>
           </tr>
         </tbody>
@@ -90,12 +102,28 @@ const datosMostrados = computed(() =>
         </button>
       </div>
     </div>
+    <div class="container">
+      <label class="imprimir">Imprimir</label>
+      <button @click="imprimirTabla" class="btn btn-secundary" title="Imprimir tabla"><i
+          class="bi bi-printer"></i></button>
+    </div>
   </div>
+
 </template>
 
 
 
 <style scoped>
+.container {
+  border-radius: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end; /* 👈 esto manda TODO al final */
+  gap: 10px;
+  border: none;
+}
+
 .tabla-carrera {
   margin-bottom: 48px;
   animation: fadeSlideIn 0.4s ease both;
@@ -264,10 +292,9 @@ tbody tr:nth-child(even):hover {
   opacity: 0.88;
   transform: translateY(-1px);
 }
+
 .buscador-wrapper {
-  display:flex;
-  
-  align-items: center;
+  width: 50%;
   gap: 8px;
   margin-bottom: 14px;
   background: #ffffff;
@@ -311,4 +338,19 @@ tbody tr:nth-child(even):hover {
   font-size: 0.88rem;
   padding: 16px 0;
 }
+
+.btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.btn-secundary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  margin-top: 10px;
+}
+
+
 </style>
