@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import swal from 'sweetalert2';
 import TablaAlumnos from './components/TablaAlumnos.vue';
+import Login from './components/Login.vue';
 
 const carreras = [
   'Ingenieria en Mecatronica',
@@ -18,6 +19,8 @@ const filtrarPorCarrera = (carrera) => {
   return alumnos.value.filter(alumno => alumno.carrera === carrera);
 }
 const alumnos = ref([]); // Definimos una variable reactiva para almacenar los alumnos
+const token = ref(localStorage.getItem('token') || null);
+if (token.value) axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
 const nuevoAlumno = ref({
   nombre: '',
   apellido: '',
@@ -39,6 +42,18 @@ const cargarAlumnos = async () => {
   //const response = await axios.get('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/traer-alumnos');//traer todos los alumnos
   alumnos.value = response.data;
   console.log(alumnos.value);
+}
+
+const onLoginSuccess = async () => {
+  token.value = localStorage.getItem('token')
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
+  await cargarAlumnos()
+}
+
+const logout = () => {
+  localStorage.removeItem('token')
+  token.value = null
+  delete axios.defaults.headers.common['Authorization']
 }
 const validarCampos = () =>{
 
@@ -335,7 +350,7 @@ const imprimirAlumnos = async ({ carrera, datos }) => {
 const eliminarAlumnoPorId = async (id) => {
   try {
     //await axios.delete(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/eliminar-alumnos/${id}`);
-    await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos${id}`);
+    await axios.delete(`http://localhost:8081/alumnos/eliminar-alumnos/${id}`);
     swal.fire({
         icon: 'success',
         title: 'Alumno Eliminado Correctamente',
@@ -354,82 +369,81 @@ const eliminarAlumnoPorId = async (id) => {
   }
 }
 
-onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el componente se monta
+onMounted(() => { if (token.value) cargarAlumnos(); }); // Llamamos a la función cargarAlumnos cuando el componente se monta
 
 
 </script>
 
 <template>
-  
+  <Login v-if="!token" @login-success="onLoginSuccess" />
 
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12 mt-4">
-        <div class="card shadow p-4 mb-4">
-          <h2 class="text-center">Formulario de Alumnos</h2>
-          <form 
-          @submit.prevent="agregarAlumno" >
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="nombre" class="form-label" >Nombre</label>
-                <input type="text" placeholder="Inserte su Nombre" class="form-control" maxlength="30" id="nombre" v-model="nuevoAlumno.nombre"
-                  required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="apellidos" class="form-label">Apellidos</label>
-                <input type="text" placeholder="Apellido Paterno y Apellido Materno" class="form-control" maxlength="30" id="apellidos" v-model="nuevoAlumno.apellido"
-                  required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="carrera" class="form-label">Carrera</label>
-                <select id="carrera" class="form-select"  style="border-radius:8px; border: 2px solid #a78bfa;" required v-model="nuevoAlumno.carrera">
-                  <option value="" disabled>Selecciona una Opción</option>
-                  <option value="Ingenieria en Mecatronica">Ingenieria en Mecatronica</option>
-                  <option value="Ingenieria en Gestion Empresarial">Ingenieria en Gestion Empresarial</option>
-                  <option value="Ingenieria Industrial">Ingenieria Industrial</option>
-                  <option value="Ingenieria Civil">Ingenieria Civil</option>
-                  <option value="Ingenieria en Sistemas Computacionales">Ingenieria en Sistemas Computacionales</option>
-                  <option value="Licenciatura en Contador Público">Licenciatura en Contador Público</option>
-                  <option value="Licenciatura en Arquitectura">Licenciatura en Arquitectura</option>
-                  <option value="Licenciatura en Arquitectura">Licenciatura en Administración</option>
-                </select>
-
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="telefono" class="form-label">Telefono</label>
-                <input type="text" placeholder="953*******" name="telefono" maxlength="10" class="form-control" id="telefono"
-                  v-model="nuevoAlumno.telefono" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <Label for="email" class="form-label"  >Correo electronico</Label>
-                <input type="text" placeholder="user@tlaxiaco.tecnm.mx" name="email" maxlength="64" class="form-control" id="email" v-model="nuevoAlumno.email">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="imagenURL" class="form-label">Imagen URL</label>
-                <input type="text" placeholder="Enlace URL" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              {{ editado ? 'Actualizar Alumno' : 'Agregar Alumno' }}
-            </button>
-          </form>
+  <div v-if="token">
+    <div class="container">
+      <div class="row mb-3">
+        <div class="col-12 d-flex justify-content-end">
+          <button class="btn btn-sm btn-danger" @click="logout">Cerrar sesión</button>
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-md-12 mt-4">
+          <div class="card shadow p-4 mb-4">
+            <h2 class="text-center">Formulario de Alumnos</h2>
+            <form @submit.prevent="agregarAlumno">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nombre" class="form-label">Nombre</label>
+                  <input type="text" placeholder="Inserte su Nombre" class="form-control" maxlength="30" id="nombre" v-model="nuevoAlumno.nombre" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="apellidos" class="form-label">Apellidos</label>
+                  <input type="text" placeholder="Apellido Paterno y Apellido Materno" class="form-control" maxlength="30" id="apellidos" v-model="nuevoAlumno.apellido" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="carrera" class="form-label">Carrera</label>
+                  <select id="carrera" class="form-select" style="border-radius:8px; border: 2px solid #a78bfa;" required v-model="nuevoAlumno.carrera">
+                    <option value="" disabled>Selecciona una Opción</option>
+                    <option value="Ingenieria en Mecatronica">Ingenieria en Mecatronica</option>
+                    <option value="Ingenieria en Gestion Empresarial">Ingenieria en Gestion Empresarial</option>
+                    <option value="Ingenieria Industrial">Ingenieria Industrial</option>
+                    <option value="Ingenieria Civil">Ingenieria Civil</option>
+                    <option value="Ingenieria en Sistemas Computacionales">Ingenieria en Sistemas Computacionales</option>
+                    <option value="Licenciatura en Contador Público">Licenciatura en Contador Público</option>
+                    <option value="Licenciatura en Arquitectura">Licenciatura en Arquitectura</option>
+                    <option value="Licenciatura en Administración">Licenciatura en Administración</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="telefono" class="form-label">Telefono</label>
+                  <input type="text" placeholder="953*******" name="telefono" maxlength="10" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="email" class="form-label">Correo electronico</label>
+                  <input type="text" placeholder="user@tlaxiaco.tecnm.mx" name="email" maxlength="64" class="form-control" id="email" v-model="nuevoAlumno.email">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="imagenURL" class="form-label">Imagen URL</label>
+                  <input type="text" placeholder="Enlace URL" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">{{ editado ? 'Actualizar Alumno' : 'Agregar Alumno' }}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div v-for="carrera in carreras" :key="carrera">
+          <TablaAlumnos
+            :carrera="carrera"
+            :datos="filtrarPorCarrera(carrera)"
+            @editar="editarAlumnos"
+            @eliminar="eliminarAlumno"
+            @imprimir="imprimirAlumnos"
+          ></TablaAlumnos>
+        </div>
+      </div>
     </div>
-
-  </div>
-<div class="container">
-
-    <TablaAlumnos
-      v-for="carrera in carreras"
-      :key="carrera"
-      :carrera="carrera"
-      :datos="filtrarPorCarrera(carrera)"
-      @editar="editarAlumnos"
-      @eliminar="eliminarAlumno"
-      @imprimir="imprimirAlumnos"
-    />
   </div>
 
 </template>
