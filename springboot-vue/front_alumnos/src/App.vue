@@ -35,7 +35,7 @@ const errores = ref({
 });
 const editado = ref(false); // Variable para controlar si se está editando un alumno
 const cargarAlumnos = async () => {
-  const response = await axios.get('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/traer-alumnos');//traer todos los alumnos
+  const response = await axios.get('http://localhost:8080/alumnos/traer-alumnos');//traer todos los alumnos
   alumnos.value = response.data;
   console.log(alumnos.value);
 }
@@ -48,7 +48,8 @@ const validarCampos = () =>{
     telefono: '',
     email: ''
   };
-
+  const PrimeraLetraMayusculaNombre= /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+( [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)?$/;
+  const PrimeraLetraMayusculaApellido= /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+ [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+$/;
   const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
   const soloNumeros = /^[0-9]{10}$/;
   const soloEmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com|tlaxiaco\.tecnm\.mx)$/;
@@ -94,6 +95,27 @@ const validarCampos = () =>{
     nuevoAlumno.value.email = '';
     valido = false;
   }
+  if
+  (!PrimeraLetraMayusculaNombre.test((nuevoAlumno.value.nombre || "").trim())){
+     swal.fire({
+      icon: 'warning',
+      text: 'El nombre debe comenzar con mayúscula y no contener números',
+      showConfirmButton: false,
+      timer: 2000
+    });
+    nuevoAlumno.value.nombre = '';
+    valido = false;
+  }
+  if  (!PrimeraLetraMayusculaApellido.test((nuevoAlumno.value.apellido || "").trim())){
+     swal.fire({
+      icon: 'warning',
+      text: 'Los apellidos deben comenzar con mayúscula y no contener números',
+      showConfirmButton: false,
+      timer: 2000
+    });
+    nuevoAlumno.value.apellido = '';
+    valido = false;
+  } 
   
   return valido;
  
@@ -108,7 +130,7 @@ const agregarAlumno = async () => {
   if (editado.value) {
   
     // Si se está editando un alumno, actualizamos el alumno
-    await axios.put(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+    await axios.put(`http://localhost:8080/alumnos/editar-alumno/${nuevoAlumno.value.id}`, nuevoAlumno.value);
     editado.value = false; // Reiniciamos la variable de edición
   
    
@@ -121,7 +143,7 @@ const agregarAlumno = async () => {
     
   } else {
     // Si no se está editando, agregamos un nuevo alumno
-    await axios.post('https://crud-alumnos-spring.uc.r.appspot.com/alumnos/insertar-alumno', nuevoAlumno.value);
+    await axios.post('http://localhost:8080/alumnos/insertar-alumno', nuevoAlumno.value);
     swal.fire({
       icon: 'success',
       title: 'Alumno Agregado Correctamente',
@@ -181,7 +203,7 @@ const eliminarAlumno = async (id) => {
 }
 const eliminarAlumnoPorId = async (id) => {
   try {
-    await axios.delete(`https://crud-alumnos-spring.uc.r.appspot.com/alumnos/eliminar-alumnos/${id}`);
+    await axios.delete(`http://localhost:8080/alumnos/eliminar-alumnos/${id}`);
     swal.fire({
         icon: 'success',
         title: 'Alumno Eliminado Correctamente',
@@ -247,7 +269,7 @@ onMounted(cargarAlumnos); // Llamamos a la función cargarAlumnos cuando el comp
                   v-model="nuevoAlumno.telefono" required>
               </div>
               <div class="col-md-6 mb-3">
-                <Label for="email" class="form-label"  >Correo electronico</Label>
+                <label for="email" class="form-label"  >Correo electronico</label>
                 <input type="text" placeholder="user@tlaxiaco.tecnm.mx" name="email" maxlength="64" class="form-control" id="email" v-model="nuevoAlumno.email">
               </div>
               <div class="col-md-6 mb-3">
