@@ -24,6 +24,7 @@ if (token.value) axios.defaults.headers.common['Authorization'] = `Bearer ${toke
 const nuevoAlumno = ref({
   nombre: '',
   apellido: '',
+  numeroControl: '',
   carrera: '',
   telefono: '',
   imagenURL: '',
@@ -33,6 +34,7 @@ const nuevoAlumno = ref({
 const errores = ref({
   nombre: '',
   apellido: '',
+  numeroControl: '',
   telefono: '',
   email: ''
 });
@@ -60,13 +62,27 @@ const validarCampos = () =>{
   errores.value = {
     nombre: '',
     apellido: '',
+    numeroControl: '',
     telefono: '',
     email: ''
   };
-
+ const PrimeraLetraMayusculaNombre= /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+( [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)?$/;
+  const PrimeraLetraMayusculaApellido= /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+ [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+$/;
   const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
   const soloNumeros = /^[0-9]{10}$/;
   const soloEmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com|tlaxiaco\.tecnm\.mx)$/;
+  const soloNumeroControl = /^[0-9]{8,15}$/;
+
+  if(!soloNumeroControl.test((nuevoAlumno.value.numeroControl || "").trim())){
+      swal.fire({
+       icon: 'warning',
+       text: 'Datos invalidos en Número de Control',
+       showConfirmButton: false,
+       timer: 2000
+     });
+    nuevoAlumno.value.numeroControl = '';
+    valido = false;
+  }
 
   if(!soloLetras.test((nuevoAlumno.value.nombre || "").trim())){
     swal.fire({
@@ -109,7 +125,27 @@ const validarCampos = () =>{
     nuevoAlumno.value.email = '';
     valido = false;
   }
-  
+  if
+  (!PrimeraLetraMayusculaNombre.test((nuevoAlumno.value.nombre || "").trim())){
+     swal.fire({
+      icon: 'warning',
+      text: 'El nombre debe comenzar con mayúscula y no contener números',
+      showConfirmButton: false,
+      timer: 2000
+    });
+    nuevoAlumno.value.nombre = '';
+    valido = false;
+  }
+  if  (!PrimeraLetraMayusculaApellido.test((nuevoAlumno.value.apellido || "").trim())){
+     swal.fire({
+      icon: 'warning',
+      text: 'Los apellidos deben comenzar con mayúscula y no contener números',
+      showConfirmButton: false,
+      timer: 2000
+    });
+    nuevoAlumno.value.apellido = '';
+    valido = false;
+  } 
   return valido;
  
 }
@@ -144,6 +180,7 @@ const agregarAlumno = async () => {
   nuevoAlumno.value = {
     nombre: '',
     apellido: '',
+    numeroControl: '',
     carrera: '',
     telefono: '',
     imagenURL: '',
@@ -294,12 +331,13 @@ const imprimirAlumnos = async ({ carrera, datos }) => {
       <table>
         <thead>
           <tr>
-            <th colspan="4" class="header-cell">
+            <th colspan="5" class="header-cell">
               <img src="${logoArriba}" class="header-img">
               <h1>${carrera}</h1>
             </th>
           </tr>
           <tr class="col-headers">
+            <th>No. Control</th>
             <th>Nombre</th>
             <th>Apellidos</th>
             <th>Email</th>
@@ -310,9 +348,10 @@ const imprimirAlumnos = async ({ carrera, datos }) => {
         <tbody>
           ${datos.map(alumno => `
             <tr>
+              <td>${alumno.numeroControl || ''}</td>
               <td>${alumno.nombre || ''}</td>
               <td>${alumno.apellido || ''}</td>
-              <td>${alumno.email || 'N/A'}</td>
+              <td>${alumno.email || ''}</td>
               <td>${alumno.telefono || ''}</td>
             </tr>
           `).join('')}
@@ -320,7 +359,7 @@ const imprimirAlumnos = async ({ carrera, datos }) => {
 
         <tfoot>
           <tr>
-            <td colspan="4" class="footer-space">&nbsp;</td>
+            <td colspan="5" class="footer-space">&nbsp;</td>
           </tr>
         </tfoot>
       </table>
@@ -419,6 +458,10 @@ onMounted(() => { if (token.value) cargarAlumnos(); });
 
           <div class="form-row">
             <div class="form-group">
+              <label>Número de Control</label>
+              <input type="text" placeholder="Ingrese su número de control" maxlength="15" v-model="nuevoAlumno.numeroControl" required>
+            </div>
+            <div class="form-group">
               <label>Carrera</label>
               <select required v-model="nuevoAlumno.carrera">
                 <option value="" disabled>Selecciona una Opción</option>
@@ -432,17 +475,21 @@ onMounted(() => { if (token.value) cargarAlumnos(); });
                 <option value="Licenciatura en Administración">Licenciatura en Administración</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>Teléfono</label>
-              <input type="text" placeholder="953*******" maxlength="10" v-model="nuevoAlumno.telefono" required>
-            </div>
+            
           </div>
 
           <div class="form-row">
             <div class="form-group">
+              <label>Teléfono</label>
+              <input type="text" placeholder="953*******" maxlength="10" v-model="nuevoAlumno.telefono" required>
+            </div>
+            <div class="form-group">
               <label>Correo electrónico</label>
               <input type="text" placeholder="user@tlaxiaco.tecnm.mx" maxlength="64" v-model="nuevoAlumno.email">
             </div>
+            
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label>Imagen URL</label>
               <input type="text" placeholder="Enlace URL" v-model="nuevoAlumno.imagenURL">

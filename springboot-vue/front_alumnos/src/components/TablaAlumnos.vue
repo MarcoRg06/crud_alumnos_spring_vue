@@ -25,7 +25,7 @@ const LIMITE = 5
 const busqueda = ref('')
 const datosFiltrados = computed(() =>
   props.datos.filter(alumno =>
-    `${alumno.nombre} ${alumno.apellido}`
+    `${alumno.nombre} ${alumno.apellido} ${alumno.numeroControl || ''}`
       .toLowerCase()
       .includes(busqueda.value.toLowerCase().trim())
   )
@@ -77,6 +77,7 @@ const datosMostrados = computed(() =>
         <thead>
           <tr>
             <th>Imagen</th>
+            <th>No. Control</th>
             <th>Nombre</th>
             <th>Apellidos</th>
             <th>Carrera</th>
@@ -92,6 +93,7 @@ const datosMostrados = computed(() =>
                 :src="item.imagenURL || 'https://ui-avatars.com/api/?name=' + item.nombre + '+' + item.apellido + '&background=3b82f6&color=fff'"
                 :alt="item.nombre" />
             </td>
+            <td class="td-control"><span class="control-chip">{{ item.numeroControl}}</span></td>
             <td class="td-nombre">{{ item.nombre }}</td>
             <td class="td-apellido">{{ item.apellido }}</td>
             <td><span class="carrera-chip">{{ item.carrera }}</span></td>
@@ -382,6 +384,23 @@ td {
 .td-telefono {
   color: #64748b;
   font-size: 0.85rem;
+}
+
+.td-control {
+  color: #334155;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.control-chip {
+ display: inline-block;
+  background: #dbeafe;
+  color: #2563eb;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .td-img img {
